@@ -1,4 +1,4 @@
-name: 'vulcan-demo'
+name: "vulcan-demo"
 description: A starter Vulcan project
 version: 0.1.0-alpha.1
 template:
@@ -23,3 +23,27 @@ types:
   - RESTFUL
 enforce-https:
   enabled: false
+response-format:
+  enabled: true
+  options:
+    default: json
+    formats:
+      - json
+      - csv
+extensions:
+  duckdb: "@vulcan-sql/extension-driver-duckdb"
+profiles:
+  - profile.yaml
+auth:
+  enabled: true
+  options:
+    basic:
+      users-list:
+        - name: tom
+          attr:
+            group: admin
+          md5Password: 202cb962ac59075b964b07152d234b70
+        - name: sandy
+          attr:
+            group: engineer
+          md5Password: 202cb962ac59075b964b07152d234b70
