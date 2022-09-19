@@ -1,11 +1,11 @@
 {
   "name": "vulcan-demo",
   "dependencies": {
-    "@vulcan-sql/build": "0.2.0-dev.20220913.0",
-    "@vulcan-sql/core": "0.2.0-dev.20220913.0",
-    "@vulcan-sql/serve": "0.2.0-dev.20220913.0",
+    "@vulcan-sql/build": "0.2.0-dev.20220919.0",
+    "@vulcan-sql/core": "0.2.0-dev.20220919.0",
+    "@vulcan-sql/extension-driver-duckdb": "^0.2.0-dev.20220919.0",
+    "@vulcan-sql/serve": "0.2.0-dev.20220919.0",
     "bcryptjs": "^2.4.3",
-    "duckdb": "^0.4.1-dev2371.0",
     "redoc": "^2.0.0"
   }
 }
