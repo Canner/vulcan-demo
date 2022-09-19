@@ -1,4 +1,4 @@
-urlPath: /example/customers
+urlPath: /customers
 profiles:
   - demo
 request:
