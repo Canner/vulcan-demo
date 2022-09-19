@@ -6,6 +6,7 @@
     "@vulcan-sql/extension-driver-duckdb": "^0.2.0-dev.20220919.0",
     "@vulcan-sql/serve": "0.2.0-dev.20220919.0",
     "bcryptjs": "^2.4.3",
-    "redoc": "^2.0.0"
+    "redoc": "^2.0.0",
+    "vulcan-demo-extensions": "file:extensions"
   }
 }

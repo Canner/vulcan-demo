@@ -32,18 +32,21 @@ response-format:
       - csv
 extensions:
   duckdb: "@vulcan-sql/extension-driver-duckdb"
+  demo: "vulcan-demo-extensions"
 profiles:
   - profile.yaml
 auth:
   enabled: true
+  options: 
+    mock-auth: {}
+demo:
+  enabled: true
   options:
-    basic:
-      users-list:
+    mock-auth:
+      users:
+        - name: may
+          attr:
+            group: engineer
         - name: tom
           attr:
             group: admin
-          md5Password: 202cb962ac59075b964b07152d234b70
-        - name: sandy
-          attr:
-            group: engineer
-          md5Password: 202cb962ac59075b964b07152d234b70
