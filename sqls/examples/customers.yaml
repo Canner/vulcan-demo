@@ -1,4 +1,4 @@
-urlPath: /customers
+urlPath: /example/customers
 profiles:
   - demo
 request:
@@ -10,6 +10,8 @@ request:
   - fieldName: limit
     fieldIn: query
   - fieldName: gender
+    fieldIn: query
+  - fieldName: attrited
     fieldIn: query
 sample:
   profile: demo
