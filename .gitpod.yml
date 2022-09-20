@@ -1,10 +1,7 @@
 tasks:
-  - init: |
-      npm install
-  - command: |
-      vulcan start
-image:
-  file: .gitpod.Dockerfile
+  - init: npm install
+    command: ./node_modules/.bin/vulcan start
+    openMode: tab-after
 ports:
   - name: Vulcan server
     port: 3000
