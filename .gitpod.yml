@@ -1,6 +1,6 @@
 tasks:
   - init: cd /workspace/vulcan-demo/doc && npm install
-    command: cd /workspace/vulcan-demo/doc && bash ./generate.sh && ./node_modules/.bin/docsify serve .
+    command: cd /workspace/vulcan-demo/doc && bash ./generate.sh && ./node_modules/.bin/docsify serve -p 3001 .
     openMode: tab-after
     name: Document server
   - init: npm install
