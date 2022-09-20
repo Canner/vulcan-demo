@@ -19,40 +19,16 @@ async function runQuery(query) {
 }
 
 (async () => {
-  console.log('inserting churners.csv ...');
   await runQuery(`
-  create table churners as 
-  select 
-    cast(CLIENTNUM as varchar) as id,
-    Customer_Age as age,
-    Gender as gender,
-    Education_Level as education_level,
-    Marital_Status as marital_status,
-    Income_Category as income_category,
-    Card_Category as card_category,
-    Months_on_book as months_on_book,
-    Total_Relationship_Count as total_relationship_count,
-    Months_Inactive_12_mon as months_inactive_12_mon,
-    Contacts_Count_12_mon	as contacts_count_12_mon,
-    Credit_Limit as	credit_limit,
-    case
-      when Attrition_Flag = 'Existing Customer' 
-        then false
-        else true 
-    end as attrited
-  from "churners.csv"
+  CREATE TABLE churners(id VARCHAR, age INTEGER, gender VARCHAR, education_level VARCHAR, marital_status VARCHAR, income_category VARCHAR, card_category VARCHAR, months_on_book INTEGER, total_relationship_count INTEGER, months_inactive_12_mon INTEGER, contacts_count_12_mon INTEGER, credit_limit DOUBLE, attrited BOOLEAN);  `);
+  await runQuery(`
+  CREATE TABLE customers(id VARCHAR, first_name VARCHAR, last_name VARCHAR, email VARCHAR);
   `);
-  console.log('done.');
-
-  console.log('inserting customers.csv ...');
   await runQuery(`
-  create table customers as 
-  select 
-    cast(id as varchar) as id,
-    first_name,
-    last_name,
-    email
-  from "customers.csv"
+  COPY churners FROM 'churners.csv' (FORMAT 'csv', quote '"', delimiter ',', header true);
+  `);
+  await runQuery(`
+  COPY customers FROM 'customers.csv' (FORMAT 'csv', quote '"', delimiter ',', header true);  
   `);
   console.log('done.');
 })();
