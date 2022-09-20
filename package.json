@@ -1,6 +1,7 @@
 {
   "name": "vulcan-demo",
   "dependencies": {
+    "@vulcan-sql/cli": "0.2.0-dev.20220919.0",
     "@vulcan-sql/build": "0.2.0-dev.20220919.0",
     "@vulcan-sql/core": "0.2.0-dev.20220919.0",
     "@vulcan-sql/extension-driver-duckdb": "^0.2.0-dev.20220919.0",
