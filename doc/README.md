@@ -2,79 +2,6 @@
 
 Start an API server with sample data in 10 minutes.
 
-## Requirements
-
-1. Ensure you have installed one of the following:
-   - [Node.js](https://nodejs.org/) 16+. You can install multiple node versions via [NVM](https://github.com/nvm-sh/nvm).
-   - Docker.
-
-## Install Vulcan SQL CLI
-
-- With Node JS
-
-  1. Install CLI globally via NPM.
-
-     ```bash
-     npm i -g @vulcan-sql/cli
-     ```
-
-  2. To ensure installation, print the version information.
-
-     ```bash
-     vulcan version
-     ```
-
-     ![Untitled](Quickstart%204f74311afc8f461fa36c3f306478ee5a/Untitled.png)
-
-- With Docker
-
-  1. Pull the CLI image.
-
-     ```bash
-     docker pull ghcr.io/canner/vulcan-sql/cli:latest
-     ```
-
-  2. Set the alias for `vulcan`.
-
-     ```bash
-     alias vulcan="docker run -it --rm -p 3000:3000 -v ${PWD}:/usr/app ghcr.io/canner/vulcan-sql/cli:dev"
-     ```
-
-  3. To ensure installation, print the version information.
-
-     ```bash
-     vulcan version
-     ```
-
-     ![Untitled](Quickstart%204f74311afc8f461fa36c3f306478ee5a/Untitled.png)
-
-## Start a server from the demo project
-
-1. Clone the project to your local environment.
-
-   ```bash
-   git clone git@github.com:Canner/vulcan-demo.git && cd vulcan-demo
-   ```
-
-2. Install dependencies.
-   - With Node JS
-     ```bash
-     npm install
-     ```
-   - With Docker
-     ```bash
-     docker run -it --rm -v ${PWD}:/usr/app --entrypoint /usr/local/bin/npm ghcr.io/canner/vulcan-sql/cli:latest install
-     ```
-3. Start the server.
-
-   ```bash
-   vulcan start --watch
-   ```
-
-4. Open the API document with URL: [{{ endpoint }}/doc]({{ endpoint }}/doc)
-
-   ![Untitled](Quickstart%204f74311afc8f461fa36c3f306478ee5a/Untitled%201.png)
-
 ## Know your data
 
 We used [Kaggle: Credit Card customers](https://www.kaggle.com/datasets/sakshigoyal7/credit-card-customers) as our demo dataset, the following is its background:
@@ -93,10 +20,7 @@ Instead of making predictions, we want to create APIs for further usage, we’ll
 
 ## Make an API with SQL: customer
 
-<aside>
-🦄 At any time you get lost, or you want to see the final result, feel free to check the full examples which are located in `sqls/examples` folder.
-
-</aside>
+?> At any time you get lost, or you want to see the final result, feel free to check the full examples which are located in `sqls/examples` folder.
 
 1.  Open `sqls/customer.sql`, it should already contain a SQL query like the below:
 
@@ -116,18 +40,14 @@ Instead of making predictions, we want to create APIs for further usage, we’ll
 
     Your first API with parameters input is done! Try the API by visiting it:
 
-    - [{{ endpoint }}/api/customer?name=GABEY]({{ endpoint }}/api/customer?name=GABEY)
-    - [{{ endpoint }}/api/customer?name=KENDELL]({{ endpoint }}/api/customer?name=KENDELL)
+    - [http://localhost:3000/api/customer?name=GABEY](http://localhost:3000/api/customer?name=GABEY)
+    - [http://localhost:3000/api/customer?name=KENDELL](http://localhost:3000/api/customer?name=KENDELL)
 
-    <aside>
-    🦄 Is it safe to render data from external sources like the user’s input?
-    Yes, we’ll parameterize all the user input like the below to prevent SQL injections.
-
-    ![Untitled](Quickstart%204f74311afc8f461fa36c3f306478ee5a/Untitled%202.png)
+    ?> Is it safe to render data from external sources like the user’s input?
+    <br> Yes, we’ll parameterize all the user input like the below to prevent SQL injections.
+    <br> ![](https://imgur.com/BWZc2tA.png)
 
     Check SQL injection(TBD, link to doc) for more information.
-
-    </aside>
 
 2.  Apply a filter(TBD, link to doc) to the input, we can to `upper` filter to let our input be case-insensitive.
 
@@ -139,114 +59,104 @@ Instead of making predictions, we want to create APIs for further usage, we’ll
 
     Now, test with some names in lower case:
 
-    - [{{ endpoint }}/api/customer?name=kendell]({{ endpoint }}/api/customer?name=kendell)
+    - [http://localhost:3000/api/customer?name=kendell](http://localhost:3000/api/customer?name=kendell)
 
 3.  Throw error when user not found. We can let our API better by showing an accurate error message.
     First, we need to execute an extra query to know whether the user is in our database:
 
-    ````sql
+    ```sql
     {% req user %}
     SELECT COUNT(\*) AS count FROM customers
     WHERE UPPER(first_name) = {{ context.params.name | upper }}
     {% endreq %}
 
-        SELECT * FROM customers
-        WHERE UPPER(first_name) = {{ context.params.name | upper }}
-        LIMIT 1
-        ```
+    SELECT * FROM customers
+    WHERE UPPER(first_name) = {{ context.params.name | upper }}
+    LIMIT 1
+    ```
 
-        The block  `{% req user %} ... {% endreq %}` is a query block (TBD, line to doc) which tells Vulcan that we want to save the query result to `user` variable instead of outputting as responses.
+    The block `{% req user %} ... {% endreq %}` is a query block (TBD, line to doc) which tells Vulcan that we want to save the query result to `user` variable instead of outputting as responses.
 
-        Now we can get the result of this query and throw an error when the result equals `0`.
+    Now we can get the result of this query and throw an error when the result equals `0`.
 
-        ```sql
-        {% req user %}
-        SELECT COUNT(*) AS count FROM customers
-        WHERE UPPER(first_name) = {{ context.params.name | upper }}
-        {% endreq %}
+    ```sql
+    {% req user %}
+    SELECT COUNT(*) AS count FROM customers
+    WHERE UPPER(first_name) = {{ context.params.name | upper }}
+    {% endreq %}
 
-        {% if user.value()[0].count == 0 %}
-          {% error "CUSTOMER_NOT_FOUND" %}
-        {% endif %}
+    {% if user.value()[0].count == 0 %}
+      {% error "CUSTOMER_NOT_FOUND" %}
+    {% endif %}
 
-        SELECT * FROM customers
-        WHERE UPPER(first_name) = {{ context.params.name | upper }}
-        LIMIT 1
-        ```
+    SELECT * FROM customers
+    WHERE UPPER(first_name) = {{ context.params.name | upper }}
+    LIMIT 1
+    ```
 
-        We used the if expression to throw an error when the result equals `0`, Vulcan server will stop executing and respond immediately when meeting a {% error %} tag, `"CUSTOMER_NOT_FOUND"` is the error code we want to throw.
+    We used the if expression to throw an error when the result equals `0`, Vulcan server will stop executing and respond immediately when meeting a {% error %} tag, `"CUSTOMER_NOT_FOUND"` is the error code we want to throw.
 
-        <aside>
-        🦄 You can add more information about your errors, e.g. description, HTTP code …etc. Please check Error response(TBD, link to doc)
+    ?> You can add more information about your errors, e.g. description, HTTP code …etc. Please check Error response(TBD, link to doc)
 
-        </aside>
+    You can test with some invalid names:
 
-        You can test with some invalid names:
-
-        - [{{ endpoint }}/api/customer?name=some-invalid-name]({{ endpoint }}/api/customer?name=some-invalid-name)
-
-    ````
+    - [http://localhost:3000/api/customer?name=some-invalid-name](http://localhost:3000/api/customer?name=some-invalid-name)
 
 4.  Throw an error when the name is ambiguous. We noticed that some customers have the same first name, let’s figure them out and throw an error.
     We’ll need to use the user’s count twice, in order the reuse the result, we need to save the result first.
 
-    ````sql
+    ```sql
     {% req user %}
     SELECT COUNT(\*) AS count FROM customers
     WHERE UPPER(first_name) = {{ context.params.name | upper }}
     {% endreq %}
 
-        {% set userCount = user.value()[0].count %}
+    {% set userCount = user.value()[0].count %}
 
-        {% if userCount == 0 %}
-          {% error "CUSTOMER_NOT_FOUND" %}
-        {% endif %}
+    {% if userCount == 0 %}
+      {% error "CUSTOMER_NOT_FOUND" %}
+    {% endif %}
 
-        SELECT * FROM customers
-        WHERE UPPER(first_name) = {{ context.params.name | upper }}
-        LIMIT 1
-        ```
+    SELECT * FROM customers
+    WHERE UPPER(first_name) = {{ context.params.name | upper }}
+    LIMIT 1
+    ```
 
-        {% set %} tag saved the result from the right side like most programming languages: `var someVar = someVal`, in this example, we saved the query result into `userCount` variable.
+    {% set %} tag saved the result from the right side like most programming languages: `var someVar = someVal`, in this example, we saved the query result into `userCount` variable.
 
-        <aside>
-        🦄 Please save only the data you need in template logic, these data will be stored in Vulcan server memory and only exist while the template is executing.
-        Please check Set tag (TBD, link to doc) for more information.
+    ?> Please save only the data you need in template logic, these data will be stored in Vulcan server memory and only exist while the template is executing.
+    <br>Please check Set tag (TBD, link to doc) for more information.
 
-        </aside>
+    Let’s finish the last part: throw `CUSTOMER_IS_AMBIGUOUS` error:
 
-        Let’s finish the last part: throw `CUSTOMER_IS_AMBIGUOUS` error:
+    ```sql
+    {% req user %}
+    SELECT COUNT(*) AS count FROM customers
+    WHERE UPPER(first_name) = {{ context.params.name | upper }}
+    {% endreq %}
 
-        ```sql
-        {% req user %}
-        SELECT COUNT(*) AS count FROM customers
-        WHERE UPPER(first_name) = {{ context.params.name | upper }}
-        {% endreq %}
+    {% set userCount = user.value()[0].count %}
 
-        {% set userCount = user.value()[0].count %}
+    {% if userCount == 0 %}
+      {% error "CUSTOMER_NOT_FOUND" %}
+    {% endif %}
 
-        {% if userCount == 0 %}
-          {% error "CUSTOMER_NOT_FOUND" %}
-        {% endif %}
+    {% if userCount > 1 %}
+      {% error "CUSTOMER_IS_AMBIGUOUS" %}
+    {% endif %}
 
-        {% if userCount > 1 %}
-          {% error "CUSTOMER_IS_AMBIGUOUS" %}
-        {% endif %}
+    SELECT * FROM customers
+    WHERE UPPER(first_name) = {{ context.params.name | upper }}
+    LIMIT 1
+    ```
 
-        SELECT * FROM customers
-        WHERE UPPER(first_name) = {{ context.params.name | upper }}
-        LIMIT 1
-        ```
+    You can test with user `Hayden`
 
-        You can test with user `Hayden`
+    - [http://localhost:3000/api/customer?name=Hayden](http://localhost:3000/api/customer?name=Hayden)
 
-        - [{{ endpoint }}/api/customer?name=Hayden]({{ endpoint }}/api/customer?name=Hayden)
+5.  The last step: add a sample request(TBD, link to doc). Vulcan is unable to describe our API responses until we give it a sample request. When you open the [API document](http://localhost:3000/doc#/paths/~1customer/get), you’ll see nothing has been described yet.
 
-    ````
-
-5.  The last step: add a sample request(TBD, link to doc). Vulcan is unable to describe our API responses until we give it a sample request. When you open the [API document]({{ endpoint }}/doc#/paths/~1customer/get), you’ll see nothing has been described yet.
-
-    ![Untitled](Quickstart%204f74311afc8f461fa36c3f306478ee5a/Untitled%203.png)
+    ![](https://imgur.com/fzPxCAU.png)
 
     Open the file `sql/customer.yaml`, and add a sample request.
 
@@ -265,7 +175,7 @@ Instead of making predictions, we want to create APIs for further usage, we’ll
 
     We have the schema for our response now!
 
-    ![Untitled](Quickstart%204f74311afc8f461fa36c3f306478ee5a/Untitled%204.png)
+    ![](https://imgur.com/waDtJh6)
 
 ## Make an API with SQL: customers
 
@@ -313,8 +223,8 @@ Instead of making predictions, we want to create APIs for further usage, we’ll
 
     You can try your API:
 
-    - [{{ endpoint }}/api/customers?limit=10]({{ endpoint }}/api/customers?limit=10)
-    - [{{ endpoint }}/api/customers?limit=10&offset=10]({{ endpoint }}/api/customers?limit=10&offset=10)
+    - [http://localhost:3000/api/customers?limit=10](http://localhost:3000/api/customers?limit=10)
+    - [http://localhost:3000/api/customers?limit=10&offset=10](http://localhost:3000/api/customers?limit=10&offset=10)
 
 2.  Same as we did at the last API, we can add some where conditions from users’ inputs:
 
@@ -356,67 +266,67 @@ Instead of making predictions, we want to create APIs for further usage, we’ll
 
     You can try this API with different parameters to see the queries changed:
 
-    - [{{ endpoint }}/api/customers?age_gt=45]({{ endpoint }}/api/customers?age_gt=45)
-    - [{{ endpoint }}/api/customers?age_gt=45&gender=m]({{ endpoint }}/api/customers?age_gt=45&gender=m)
-    - [{{ endpoint }}/api/customers?age_gt=45&gender=m&attrited=yes]({{ endpoint }}/api/customers?age_gt=45&gender=m&attrited=yes)
+    - [http://localhost:3000/api/customers?age_gt=45](http://localhost:3000/api/customers?age_gt=45)
+    - [http://localhost:3000/api/customers?age_gt=45&gender=m](http://localhost:3000/api/customers?age_gt=45&gender=m)
+    - [http://localhost:3000/api/customers?age_gt=45&gender=m&attrited=yes](http://localhost:3000/api/customers?age_gt=45&gender=m&attrited=yes)
 
 3.  Let’s finish the tutorial with a cool feature: render by users’ attribute. Assuming we don’t want to show the id of the customer to all people because it might be sensitive, we can mask it when the API requester is not an administrator.
-    You can use your own authenticators for your organization, please check Authenticators (TBD, link to doc) for further information. In this tutorial, we use a mock authenticator: You can simply be authenticated by adding `user` parameter, e.g. [{{ endpoint }}/api/customers?user=tom]({{ endpoint }}/api/customers?user=tom)
+    You can use your own authenticators for your organization, please check Authenticators (TBD, link to doc) for further information. In this tutorial, we use a mock authenticator: You can simply be authenticated by adding `user` parameter, e.g. [http://localhost:3000/api/customers?user=tom](http://localhost:3000/api/customers?user=tom)
     We’ve set two users and their groups in the config:
 
-        ```yaml
-        - name: may
-          attr:
-            group: engineer
-        - name: tom
-          attr:
-            group: admin
-        ```
+    ```yaml
+    - name: may
+      attr:
+        group: engineer
+    - name: tom
+      attr:
+        group: admin
+    ```
 
-        Now we want to mask the id column when the user’s attribute is not `admin`:
+    Now we want to mask the id column when the user’s attribute is not `admin`:
 
-        ```sql
-        SELECT
-          {% if context.user.attr.group == 'admin' %}
-            id
-          {% else %}
-            CONCAT(SUBSTR(id, 0, 4), 'xxxxxx')
-          {% endif %} as id,
-          age,
-          gender,
-          education_level,
-          marital_status,
-          income_category,
-          months_on_book,
-          total_relationship_count,
-          months_inactive_12_mon,
-          contacts_count_12_mon,
-          credit_limit,
-          attrited
-        FROM churners
+    ```sql
+    SELECT
+      {% if context.user.attr.group == 'admin' %}
+        id
+      {% else %}
+        CONCAT(SUBSTR(id, 0, 4), 'xxxxxx')
+      {% endif %} as id,
+      age,
+      gender,
+      education_level,
+      marital_status,
+      income_category,
+      months_on_book,
+      total_relationship_count,
+      months_inactive_12_mon,
+      contacts_count_12_mon,
+      credit_limit,
+      attrited
+    FROM churners
 
-        WHERE
-        age > {{ context.params.age_gt | default(0) }}
+    WHERE
+    age > {{ context.params.age_gt | default(0) }}
 
-        {% if context.params.gender %}
-        AND gender = {{ context.params.gender | upper }}
-        {% endif %}
+    {% if context.params.gender %}
+    AND gender = {{ context.params.gender | upper }}
+    {% endif %}
 
-        {% if context.params.attrited %}
-          {% set attrited = context.params.attrited == 'yes' %}
-          AND attrited = {{ attrited }}
-        {% endif %}
+    {% if context.params.attrited %}
+      {% set attrited = context.params.attrited == 'yes' %}
+      AND attrited = {{ attrited }}
+    {% endif %}
 
-        OFFSET {{ context.params.offset | default(0) }}
-        LIMIT {{ context.params.limit | default(20) }}
-        ```
+    OFFSET {{ context.params.offset | default(0) }}
+    LIMIT {{ context.params.limit | default(20) }}
+    ```
 
-        You can try this API with different users:
+    You can try this API with different users:
 
-        - [{{ endpoint }}/api/customers?user=tom]({{ endpoint }}/api/customers?user=tom)
-        - [{{ endpoint }}/api/customers?user=may]({{ endpoint }}/api/customers?user=may)
+    - [http://localhost:3000/api/customers?user=tom](http://localhost:3000/api/customers?user=tom)
+    - [http://localhost:3000/api/customers?user=may](http://localhost:3000/api/customers?user=may)
 
-            ![Untitled](Quickstart%204f74311afc8f461fa36c3f306478ee5a/Untitled%205.png)
+      ![](https://imgur.com/hQLWPN5.png)
 
 ## Next
 

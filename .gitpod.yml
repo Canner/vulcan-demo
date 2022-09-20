@@ -2,8 +2,18 @@ tasks:
   - init: npm install
     command: ./node_modules/.bin/vulcan start
     openMode: tab-after
+    name: Vulcan
+  - init: cd ./doc && npm install
+    command: cd ./doc && bash ./generate.sh && ./node_modules/.bin/docsify serve .
+    openMode: tab-before
+    name: Document server
+
 ports:
   - name: Vulcan server
     port: 3000
     onOpen: ignore
     visibility: public
+  - name: Document
+    port: 3001
+    onOpen: open-preview
+    visibility: private
