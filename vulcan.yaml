@@ -37,7 +37,7 @@ profiles:
   - profile.yaml
 auth:
   enabled: true
-  options: 
+  options:
     mock-auth: {}
 demo:
   enabled: true

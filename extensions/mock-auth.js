@@ -1,7 +1,7 @@
 const { BaseAuthenticator } = require('@vulcan-sql/serve');
 
 class MockAuthenticator extends BaseAuthenticator {
-  async authenticate(ctx) {
+  async authCredential(ctx) {
     const { users } = this.getOptions();
     return {
       status: 'SUCCESS',
