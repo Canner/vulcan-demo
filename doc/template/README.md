@@ -28,7 +28,7 @@ Instead of making predictions, we want to create APIs for further usage, we'll m
     LIMIT 1
     ```
 
-    We'd like to use the name of the user's input `name` to replace the static string “LIUKA”, so please update the SQL using the [template variable](./api-building/sql-template#dynamic-parameter) `{{ context.params.name }}`.
+    We'd like to use the name of the user's input `name` to replace the static string “LIUKA”, so please update the SQL using the [template variable](https://docs.vulcansql.com/api-building/sql-template#dynamic-parameter) `{{ context.params.name }}`.
 
     ```sql
     SELECT * FROM customers
@@ -44,7 +44,7 @@ Instead of making predictions, we want to create APIs for further usage, we'll m
     ?> Is it safe to render data from external sources like the user's input? <br/>
        Yes, we'll parameterize all the user input like the below to prevent SQL injections. <br/>
        ![screenshot of parameterd queries](https://imgur.com/BWZc2tA.png) <br />
-       Check [Display the variable](./api-building/sql-template#display-the-variable--dynamic-parameter) for more information.
+       Check [Display the variable](https://docs.vulcansql.com/api-building/sql-template#display-the-variable--dynamic-parameter) for more information.
 
 
 2.  Apply a [filter](./api-building/sql-template#filters) to the input, we can to `upper` filter to let our input be case-insensitive.
@@ -73,7 +73,7 @@ Instead of making predictions, we want to create APIs for further usage, we'll m
     LIMIT 1
     ```
 
-    The block `{% req user %} ... {% endreq %}` is a [query block](./api-building/sql-builder) which tells VulcanSQL that we want to save the query result to `user` variable instead of outputting as responses.
+    The block `{% req user %} ... {% endreq %}` is a [query block](https://docs.vulcansql.com/api-building/sql-builder) which tells VulcanSQL that we want to save the query result to `user` variable instead of outputting as responses.
 
     Now we can get the result of this query and throw an error when the result equals `0`.
 
@@ -94,7 +94,7 @@ Instead of making predictions, we want to create APIs for further usage, we'll m
 
     We used the if expression to throw an error when the result equals `0`, VulcanSQL server will stop executing and respond immediately when meeting a `{% error %}` tag, `"CUSTOMER_NOT_FOUND"` is the error code we want to throw.
 
-  ?> You can add more information about your errors, e.g. description, HTTP code …etc. Please check [Error response](./api-building/error-response)
+  ?> You can add more information about your errors, e.g. description, HTTP code …etc. Please check [Error response](https://docs.vulcansql.com/api-building/error-response)
 
     You can test with some invalid names:
 
@@ -123,7 +123,7 @@ Instead of making predictions, we want to create APIs for further usage, we'll m
     `{% set %}` tag saved the result from the right side like most programming languages: `var someVar = someVal`, in this example, we saved the query result into `userCount` variable.
 
   ?> Please save only the data you need in template logic, these data will be stored in VulcanSQL server memory and only exist while the template is executing. <br/>
-      Please check [Set tag](./api-building/sql-template#set-variable) for more information.
+      Please check [Set tag](https://docs.vulcansql.com/api-building/sql-template#set-variable) for more information.
 
     Let's finish the last part: throw `CUSTOMER_IS_AMBIGUOUS` error:
 
@@ -152,7 +152,7 @@ Instead of making predictions, we want to create APIs for further usage, we'll m
 
     - [{{ endpoint }}/api/customer?name=Hayden]({{ endpoint }}/api/customer?name=Hayden)
 
-5.  The last step: add a [sample request](./api-building/api-document#set-sampler). VulcanSQL is unable to describe our API responses until we give it a sample request. When you open the [API document]({{ endpoint }}/doc#/paths/~1customer/get), you'll see nothing has been described yet.
+5.  The last step: add a [sample request](https://docs.vulcansql.com/api-building/api-document#set-sampler). VulcanSQL is unable to describe our API responses until we give it a sample request. When you open the [API document]({{ endpoint }}/doc#/paths/~1customer/get), you'll see nothing has been described yet.
 
     ![api document with empty response](https://imgur.com/fzPxCAU.png)
 
@@ -269,7 +269,7 @@ Instead of making predictions, we want to create APIs for further usage, we'll m
     - [{{ endpoint }}/api/customers?age_gt=45&gender=m&attrited=yes]({{ endpoint }}/api/customers?age_gt=45&gender=m&attrited=yes)
 
 3.  Let's finish the tutorial with a cool feature: render by users' attribute. Assuming we don't want to show the id of the customer to all people because it might be sensitive, we can mask it when the API requester is not an administrator.
-    You can use your own authenticators for your organization, please check [Authenticator](./api-building/access-control/authenticator) for further information. In this tutorial, we use a mock authenticator: You can simply be authenticated by adding `user` parameter, e.g. [{{ endpoint }}/api/customers?user=tom]({{ endpoint }}/api/customers?user=tom)
+    You can use your own authenticators for your organization, please check [Authenticator](https://docs.vulcansql.com/api-building/access-control/authenticator) for further information. In this tutorial, we use a mock authenticator: You can simply be authenticated by adding `user` parameter, e.g. [{{ endpoint }}/api/customers?user=tom]({{ endpoint }}/api/customers?user=tom)
     We've set two users and their groups in the config:
 
     ```yaml

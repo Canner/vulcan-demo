@@ -4,7 +4,7 @@ tasks:
     openMode: tab-after
     name: Document server
   - init: npm install
-    command: ./node_modules/.bin/vulcan start
+    command: ./node_modules/.bin/vulcan start --watch
     openMode: tab-after
     name: Vulcan
 ports:
