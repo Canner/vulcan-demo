@@ -1,7 +1,5 @@
 # Quickstart
 
-Start an API server with sample data in 10 minutes.
-
 ## Know your data
 
 We used [Kaggle: Credit Card customers](https://www.kaggle.com/datasets/sakshigoyal7/credit-card-customers) as our demo dataset, the following is its background:
@@ -13,10 +11,10 @@ We have two tables in our database from part of this dataset (first 1000 rows):
 - [customers](https://github.com/Canner/vulcan-demo/blob/main/data/customers.csv) contains the basic information of our customers
 - [churners](https://github.com/Canner/vulcan-demo/blob/main/data/churners.csv) contains the monitoring result of them including their age, salary, marital status …etc, and `attrited` column indicates whether the customer was attrited or not.
 
-Instead of making predictions, we want to create APIs for further usage, we’ll make two APIs in this tutorial:
+Instead of making predictions, we want to create APIs for further usage, we'll make two APIs in this tutorial:
 
-- `/customer?name=${name}` to query user’s basic information.
-- `/customers?<filter>` to query users’ monitoring results that fit the filter.
+- `/customer?name=${name}` to query user's basic information.
+- `/customers?<filter>` to query users' monitoring results that fit the filter.
 
 ## Make an API with SQL: customer
 
@@ -30,7 +28,7 @@ Instead of making predictions, we want to create APIs for further usage, we’ll
     LIMIT 1
     ```
 
-    We’d like to use the name of the user’s input `name` to replace the static string “LIUKA”, so please update the SQL using the template variable(TBD, link to doc) `{{ context.params.name }}`.
+    We'd like to use the name of the user's input `name` to replace the static string “LIUKA”, so please update the SQL using the [template variable](./api-building/sql-template#dynamic-parameter) `{{ context.params.name }}`.
 
     ```sql
     SELECT * FROM customers
@@ -43,13 +41,13 @@ Instead of making predictions, we want to create APIs for further usage, we’ll
     - [{{ endpoint }}/api/customer?name=GABEY]({{ endpoint }}/api/customer?name=GABEY)
     - [{{ endpoint }}/api/customer?name=KENDELL]({{ endpoint }}/api/customer?name=KENDELL)
 
-    ?> Is it safe to render data from external sources like the user’s input?
-    <br> Yes, we’ll parameterize all the user input like the below to prevent SQL injections.
-    <br> ![](https://imgur.com/BWZc2tA.png)
+    ?> Is it safe to render data from external sources like the user's input? <br/>
+       Yes, we'll parameterize all the user input like the below to prevent SQL injections. <br/>
+       ![screenshot of parameterd queries](https://imgur.com/BWZc2tA.png) <br />
+       Check [Display the variable](./api-building/sql-template#display-the-variable--dynamic-parameter) for more information.
 
-    Check SQL injection(TBD, link to doc) for more information.
 
-2.  Apply a filter(TBD, link to doc) to the input, we can to `upper` filter to let our input be case-insensitive.
+2.  Apply a [filter](./api-building/sql-template#filters) to the input, we can to `upper` filter to let our input be case-insensitive.
 
     ```sql
     SELECT * FROM customers
@@ -66,7 +64,7 @@ Instead of making predictions, we want to create APIs for further usage, we’ll
 
     ```sql
     {% req user %}
-    SELECT COUNT(\*) AS count FROM customers
+    SELECT COUNT(*) AS count FROM customers
     WHERE UPPER(first_name) = {{ context.params.name | upper }}
     {% endreq %}
 
@@ -75,7 +73,7 @@ Instead of making predictions, we want to create APIs for further usage, we’ll
     LIMIT 1
     ```
 
-    The block `{% req user %} ... {% endreq %}` is a query block (TBD, line to doc) which tells Vulcan that we want to save the query result to `user` variable instead of outputting as responses.
+    The block `{% req user %} ... {% endreq %}` is a [query block](./api-building/sql-builder) which tells VulcanSQL that we want to save the query result to `user` variable instead of outputting as responses.
 
     Now we can get the result of this query and throw an error when the result equals `0`.
 
@@ -94,20 +92,20 @@ Instead of making predictions, we want to create APIs for further usage, we’ll
     LIMIT 1
     ```
 
-    We used the if expression to throw an error when the result equals `0`, Vulcan server will stop executing and respond immediately when meeting a {% error %} tag, `"CUSTOMER_NOT_FOUND"` is the error code we want to throw.
+    We used the if expression to throw an error when the result equals `0`, VulcanSQL server will stop executing and respond immediately when meeting a `{% error %}` tag, `"CUSTOMER_NOT_FOUND"` is the error code we want to throw.
 
-    ?> You can add more information about your errors, e.g. description, HTTP code …etc. Please check Error response(TBD, link to doc)
+  ?> You can add more information about your errors, e.g. description, HTTP code …etc. Please check [Error response](./api-building/error-response)
 
     You can test with some invalid names:
 
     - [{{ endpoint }}/api/customer?name=some-invalid-name]({{ endpoint }}/api/customer?name=some-invalid-name)
 
-4.  Throw an error when the name is ambiguous. We noticed that some customers have the same first name, let’s figure them out and throw an error.
-    We’ll need to use the user’s count twice, in order the reuse the result, we need to save the result first.
+4.  Throw an error when the name is ambiguous. We noticed that some customers have the same first name, let's figure them out and throw an error.
+    We'll need to use the user's count twice, in order the reuse the result, we need to save the result first.
 
     ```sql
     {% req user %}
-    SELECT COUNT(\*) AS count FROM customers
+    SELECT COUNT(*) AS count FROM customers
     WHERE UPPER(first_name) = {{ context.params.name | upper }}
     {% endreq %}
 
@@ -122,12 +120,12 @@ Instead of making predictions, we want to create APIs for further usage, we’ll
     LIMIT 1
     ```
 
-    {% set %} tag saved the result from the right side like most programming languages: `var someVar = someVal`, in this example, we saved the query result into `userCount` variable.
+    `{% set %}` tag saved the result from the right side like most programming languages: `var someVar = someVal`, in this example, we saved the query result into `userCount` variable.
 
-    ?> Please save only the data you need in template logic, these data will be stored in Vulcan server memory and only exist while the template is executing.
-    <br>Please check Set tag (TBD, link to doc) for more information.
+  ?> Please save only the data you need in template logic, these data will be stored in VulcanSQL server memory and only exist while the template is executing. <br/>
+      Please check [Set tag](./api-building/sql-template#set-variable) for more information.
 
-    Let’s finish the last part: throw `CUSTOMER_IS_AMBIGUOUS` error:
+    Let's finish the last part: throw `CUSTOMER_IS_AMBIGUOUS` error:
 
     ```sql
     {% req user %}
@@ -154,9 +152,9 @@ Instead of making predictions, we want to create APIs for further usage, we’ll
 
     - [{{ endpoint }}/api/customer?name=Hayden]({{ endpoint }}/api/customer?name=Hayden)
 
-5.  The last step: add a sample request(TBD, link to doc). Vulcan is unable to describe our API responses until we give it a sample request. When you open the [API document]({{ endpoint }}/doc#/paths/~1customer/get), you’ll see nothing has been described yet.
+5.  The last step: add a [sample request](./api-building/api-document#set-sampler). VulcanSQL is unable to describe our API responses until we give it a sample request. When you open the [API document]({{ endpoint }}/doc#/paths/~1customer/get), you'll see nothing has been described yet.
 
-    ![](https://imgur.com/fzPxCAU.png)
+    ![api document with empty response](https://imgur.com/fzPxCAU.png)
 
     Open the file `sql/customer.yaml`, and add a sample request.
 
@@ -170,12 +168,12 @@ Instead of making predictions, we want to create APIs for further usage, we’ll
     sample:
       profile: demo
       parameters:
-        name: "Liuka"
+        name: 'Liuka'
     ```
 
     We have the schema for our response now!
 
-    ![](https://imgur.com/waDtJh6)
+    ![api document with proper response](https://imgur.com/waDtJh6.png)
 
 ## Make an API with SQL: customers
 
@@ -226,7 +224,7 @@ Instead of making predictions, we want to create APIs for further usage, we’ll
     - [{{ endpoint }}/api/customers?limit=10]({{ endpoint }}/api/customers?limit=10)
     - [{{ endpoint }}/api/customers?limit=10&offset=10]({{ endpoint }}/api/customers?limit=10&offset=10)
 
-2.  Same as we did at the last API, we can add some where conditions from users’ inputs:
+2.  Same as we did at the last API, we can add some where conditions from users' inputs:
 
     ```sql
     SELECT
@@ -260,9 +258,9 @@ Instead of making predictions, we want to create APIs for further usage, we’ll
     LIMIT {{ context.params.limit | default(20) }}
     ```
 
-    We use `default` filter here to set the fallback value. When users don’t send the parameter, we use a default value.
+    We use `default` filter here to set the fallback value. When users don't send the parameter, we use a default value.
 
-    Unlike the last API, we use {% if %} expression the determine whether render the SQL or not, the queries in if blocks are only sent when the condition is satisfied.
+    Unlike the last API, we use `{% if %}` expression the determine whether render the SQL or not, the queries in if blocks are only sent when the condition is satisfied.
 
     You can try this API with different parameters to see the queries changed:
 
@@ -270,9 +268,9 @@ Instead of making predictions, we want to create APIs for further usage, we’ll
     - [{{ endpoint }}/api/customers?age_gt=45&gender=m]({{ endpoint }}/api/customers?age_gt=45&gender=m)
     - [{{ endpoint }}/api/customers?age_gt=45&gender=m&attrited=yes]({{ endpoint }}/api/customers?age_gt=45&gender=m&attrited=yes)
 
-3.  Let’s finish the tutorial with a cool feature: render by users’ attribute. Assuming we don’t want to show the id of the customer to all people because it might be sensitive, we can mask it when the API requester is not an administrator.
-    You can use your own authenticators for your organization, please check Authenticators (TBD, link to doc) for further information. In this tutorial, we use a mock authenticator: You can simply be authenticated by adding `user` parameter, e.g. [{{ endpoint }}/api/customers?user=tom]({{ endpoint }}/api/customers?user=tom)
-    We’ve set two users and their groups in the config:
+3.  Let's finish the tutorial with a cool feature: render by users' attribute. Assuming we don't want to show the id of the customer to all people because it might be sensitive, we can mask it when the API requester is not an administrator.
+    You can use your own authenticators for your organization, please check [Authenticator](./api-building/access-control/authenticator) for further information. In this tutorial, we use a mock authenticator: You can simply be authenticated by adding `user` parameter, e.g. [{{ endpoint }}/api/customers?user=tom]({{ endpoint }}/api/customers?user=tom)
+    We've set two users and their groups in the config:
 
     ```yaml
     - name: may
@@ -283,7 +281,7 @@ Instead of making predictions, we want to create APIs for further usage, we’ll
         group: admin
     ```
 
-    Now we want to mask the id column when the user’s attribute is not `admin`:
+    Now we want to mask the id column when the user's attribute is not `admin`:
 
     ```sql
     SELECT
@@ -319,6 +317,7 @@ Instead of making predictions, we want to create APIs for further usage, we’ll
 
     OFFSET {{ context.params.offset | default(0) }}
     LIMIT {{ context.params.limit | default(20) }}
+
     ```
 
     You can try this API with different users:
@@ -326,9 +325,4 @@ Instead of making predictions, we want to create APIs for further usage, we’ll
     - [{{ endpoint }}/api/customers?user=tom]({{ endpoint }}/api/customers?user=tom)
     - [{{ endpoint }}/api/customers?user=may]({{ endpoint }}/api/customers?user=may)
 
-      ![](https://imgur.com/hQLWPN5.png)
-
-## Next
-
-- Installation
-- API Building
+    ![api response with masked result](https://imgur.com/hQLWPN5.png)
